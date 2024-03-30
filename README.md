@@ -1,5 +1,5 @@
 # Lightpad - A theme for Trilium Notes
-This is my personal theme for Lightpad. I initially modified the default theme to add some padding between elements. Also, I like light theme, so I named this theme "Lightpad". Eventually, it snowballed into this.
+This is my personal theme for Lightpad. I initially modified the default theme to add some padding between elements. Also, I like light themes, so I named this theme "Lightpad". Eventually, it snowballed into this.
 
 This theme tries to make the mobile frontend a bit less finicky. It is also a bit of a hack as it involves major changes to layouts so things will probably break in the future. I don't have a lot of experience with CSS so I'm sorry about the stylesheet file looks 😵.
 
@@ -15,7 +15,7 @@ I had to include JS for this as Bootstrap's tooltips and dropdowns in overflowin
 ![TriliumLightpadScrollableLauncherPaneDesktop](https://github.com/ohmstance/trilium-lightpad-theme/assets/58171737/8036936d-3c05-4225-a8cd-ba971a10b24a)
 
 ## Mobile frontend
-I started looking for other note-taking application because the default Trilium theme sucks for mobile use. I decided stayed with Trilium as I like organizing my notes into trees -- so I tried my hand to make Trilium a bit more usable on my phone. 
+I started looking for other note-taking application because the default Trilium theme sucks for mobile use. I decided to stay with Trilium as I like organizing my notes into trees -- so I tried my hand to make Trilium a bit more usable on my phone. 
 
 ### Changes
 - Moved launcher pane to the top when portrait and made it scrollable.
