@@ -103,7 +103,7 @@ function runscript() {
 
     const configBoundary = function (mutationList, observer) {
         /* Tooltip */
-        var eventHandlers = findEventHandlers('mouseover', '#launcher-container *[data-toggle]').slice(1);
+        var eventHandlers = findEventHandlers('mouseover', '#launcher-container *[data-toggle]');
         for (const eventHandle of eventHandlers) {
             let tooltipData = $(eventHandle.element).data('bs.tooltip');
             if (typeof tooltipData.tip !== 'undefined' || tooltipData.tip !== null) {
