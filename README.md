@@ -15,7 +15,7 @@ I had to include JS for this as Bootstrap's tooltips and dropdowns in overflowin
 ![TriliumLightpadScrollableLauncherPaneDesktop](https://github.com/ohmstance/trilium-lightpad-theme/assets/58171737/8036936d-3c05-4225-a8cd-ba971a10b24a)
 
 ## Mobile frontend
-I tried looking for other note-taking application because the default Trilium theme sucks for mobile use. Eventually, I stayed with Trilium as I like organizing my notes into trees -- so I tried my hand to make Trilium a bit more usable on my phone. 
+I started looking for other note-taking application because the default Trilium theme sucks for mobile use. I decided stayed with Trilium as I like organizing my notes into trees -- so I tried my hand to make Trilium a bit more usable on my phone. 
 
 ### Changes
 - Moved launcher pane to the top when portrait and made it scrollable.
