@@ -1,0 +1,1439 @@
+/* Hello there! This is my personal theme, Lightpad.
+Hmmm. I hope nothing breaks in the next major release.
+Ver. 20240330-0
+*/
+
+@font-face { /* Main font */
+  font-family: 'Inter';
+  font-style: normal;
+  font-weight: 100 900;
+  src: url('/custom/themes/Lightpad/Inter.woff2') format('woff2');
+}
+
+:root {
+    --theme-style: light;
+
+    --main-font-family: Inter;
+    --main-font-size: normal;
+
+    --tree-font-family: Inter;
+    --tree-font-size: normal;
+    
+    /* Tree font size on mobile. */
+    --mobile-tree-font-size: normal;
+
+    --detail-font-family: Inter;
+    --detail-font-size: normal;
+
+    --monospace-font-family: JetBrainsLight;
+    --monospace-font-size: normal;
+
+    --main-background-color: white;
+    --main-text-color: black;
+    --main-border-color: #ccc;
+
+    --accented-background-color: #f5f5f5;
+    --more-accented-background-color: #ddd;
+
+    --button-background-color: transparent;
+    --button-border-color: #ddd;
+    --button-text-color: black;
+    /* Not just used for buttons but for other elements as well like dropdowns and search boxes, or anything that has box shadows applied on hover. */
+    --button-border-radius: .5rem;
+    --button-disabled-background-color: #ddd;
+    --button-disabled-text-color: black;
+
+    --primary-button-background-color: #6c757d;
+    --primary-button-text-color: white;
+    --primary-button-border-color: #6c757d;
+
+    --muted-text-color: #666;
+
+    --input-text-color: black;
+    --input-background-color: transparent;
+
+    --hover-item-text-color: black;
+    
+    --hover-item-background-color: transparent;
+    --hover-item-border-color: #ccc;
+    
+    /* Box shadow effect on hover of buttons. */
+    --hover-item-box-shadow: inset 0 0 0 50px rgba(0, 0, 0, 0.05);
+
+    --active-item-text-color: black;
+    --active-item-background-color: #ddd;
+    --active-item-border-color: transparent;
+
+    --menu-text-color: black;
+    --menu-background-color: white;
+
+    --modal-background-color: white;
+    --modal-backdrop-color: black;
+
+    --left-pane-background-color: #F7F7F7;
+    --left-pane-text-color: #333;
+
+    --launcher-pane-background-color: #F7F7F7;
+    --launcher-pane-text-color: #333;
+
+    --active-tab-background-color: var(--main-background-color);
+    --active-tab-hover-background-color: var(--main-background-color);
+    --active-tab-text-color: black;
+
+    --inactive-tab-background-color: #f7f7f7;
+    --inactive-tab-hover-background-color: var(--accented-background-color);
+    --inactive-tab-text-color: #666;
+
+    --scrollbar-border-color: #ddd;
+    --tooltip-background-color: #f8f8f8;
+    --link-color: blue;
+
+    --mermaid-theme: default;
+    
+    /* Scrollbar width. */
+    --scrollbar-width: 8px;
+    --scrollbar-width-mobile: 4px;
+}
+
+/* TABLE OF CONTENT
+1. General
+    1.1 Fixes
+    1.2 Scrollbar
+    1.3 Global tags
+2. Appearance
+    2.1 Tab row
+    2.2 Launcher pane
+    2.3 Tree pane
+    2.4 Quick search
+    2.5 Note
+    2.6 Dropdown menu
+3. Mobile layout
+    3.1 Fixes
+    3.2 Scrollbar
+    3.3 Launcher pane
+    3.4 Tree pane
+    3.5 Note
+    3.6 Dropdown menu
+*/
+
+/* <> 1. = General ============================================= */
+/* || 1.1 - Fixes -------------- */
+
+/* Fix for flickering tooltips as tooltips steal pointer events if overlapped with tooltip-triggering element. */
+.tooltip {
+    pointer-events: none;
+}
+
+/* Tree pane: Tree floating buttons overflowing viewport after hiding and opening tree */
+body #root-widget #launcher-pane { 
+    min-width: 53px; 
+}
+body #root-widget #left-pane { 
+    min-width: 100px !important; 
+}
+
+/* Note: Long URLs overflow off note in read-only mode, causing horizontal scroll -- enable word breaking. */ 
+body #root-widget .note-detail-readonly-text-content p {
+    word-break: break-word;
+}
+
+/* Scrolling: Prevent touch html/body overscroll */
+html, body {
+    overscroll-behavior-y: none;
+}
+
+/* Safari-related changes, for mobile front-end */
+html {
+    /* Disable native iOS context menu on long press */
+    -webkit-touch-callout: none;
+    /* Disable text selection on UI such as tree pane. Doesn't affect editors, however, which is what I want. */ 
+    -webkit-user-select: none;
+    /* Disable text auto inflation algo. It looks fine the way it is. */
+    -webkit-text-size-adjust: none;
+    /* Do it for other browsers as well. */
+    text-size-adjust: none;
+}
+
+/* For some reason Bootstrap set border to black when hovered on. Effect seen on note search navigation buttons. */
+body .btn-outline-secondary:hover {
+    border-color: var(--button-border-color);
+}
+
+/* Uh why doesn't protected session dialogue fade background? Just to be consistent. */
+body .protected-session-password-dialog {
+    background: rgba(0, 0, 0, 0.5);
+}
+
+/* || 1.2 - Scrollbar ---------- */
+
+/* Use transparent scrollbar rail on Firefox */
+@supports not selector(::-webkit-scrollbar) {
+    html body {
+        scrollbar-color: #dcdcdc transparent !important;
+    }
+    /* Firefox uses overlay scrollbar -- a bit distracting when mouse crosses scrollbar as it gets bigger on hover then suddenly disappears. Disable setting overflow: none when mouse not in tree scrolling container. */
+    html body .tree {
+        overflow: auto;
+    }
+}
+
+@supports selector(::-webkit-scrollbar) {
+    /* Blink scrollbar theming. */
+    /* Using scrollbar-* disables ::-webkit-* -- unsets this property. */
+    html body {
+        scrollbar-color: unset;
+    }
+    /* Set scrollbar width */
+    body ::-webkit-scrollbar {
+        width: var(--scrollbar-width);
+        height: var(--scrollbar-width);
+    }
+    /* Use boxy scrollbars */
+    body ::-webkit-scrollbar-thumb {
+        border-radius: 0;
+        border: unset;
+        background-color: rgba(0, 0, 0, 0.05);
+    }
+    /* Tint scrollbar on hover */
+    body ::-webkit-scrollbar-thumb:hover {
+        box-shadow: var(--hover-item-box-shadow);
+        cursor: pointer;
+    }
+}
+
+/* Show scrollbars only on hover on tree. */
+/*
+body .tree {
+    overflow: hidden;
+}
+body .tree:hover {
+    overflow: auto;
+}
+*/
+
+/* || 1.3 - Global tags -------- */
+
+/* Apply box shadow effect on hover of buttons */
+/* Does not actually apply to all of them as some 'buttons' need some TLC. */ 
+body button:hover:not([disabled]),
+body .icon-action:hover:not([disabled]),
+body .slider:hover:not([disabled]),
+body .launcher-button:hover:not([disabled]) { 
+    box-shadow: var(--hover-item-box-shadow);
+}
+
+/* Set button rounding radius for button groups. */
+body .btn-group > button:first-child {
+    border-top-left-radius: var(--button-border-radius);
+    border-bottom-left-radius: var(--button-border-radius);
+}
+body .btn-group > button:last-child {
+    border-top-right-radius: var(--button-border-radius);
+    border-bottom-right-radius: var(--button-border-radius);
+}
+
+/* Center elements in button and create gap between icon and button name. */
+body button,
+body .icon-action {
+    display: flex inline;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    /*transition: box-shadow 0.2s;*/
+    /*border-radius: var(--button-border-radius);*/
+}
+
+/* Set border radius for a lot of things. */
+body .tooltip-inner,
+body .modal-content,
+body .tree-settings-popup {
+    border-radius: var(--button-border-radius);
+}
+
+/* Styling modal header for 'focused dialogue boxes'. As I'd like buttons such as close note button to have tinting on hover, I'd have to apply appropriate padding and styling. */
+body .modal-header {
+    padding: .75rem 1rem .5rem 1rem !important;
+    align-items: center;
+    column-gap: 10px;
+}
+body .modal-header > button {
+    padding: 5px !important;
+    margin: 0 !important;
+    border-radius: var(--button-border-radius);
+    
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    height: 32px;
+    min-width: 32px;
+}
+
+/* Help dialogue. By default appears fullscreen which is a bit much. Make it consistent with other modals. */
+body .help-dialog .modal-dialog {
+    top: 5vh;
+    left: 5vw;
+    height: 90vh !important;
+    min-width: 90vw !important;
+}
+body .help-dialog .modal-dialog .modal-content {
+    height: inherit !important;
+}
+
+/* Capitalize first letter of search menu. */
+body .form-check-label:first-letter {
+    text-transform: capitalize;
+}
+
+/* <> 2. = Appearance ========================================== */
+/* || 2.1 - Tab row ------------ */
+
+/* Remove gap between tabs and overlap borders properly. */
+/* As tab position is done using transform property, specifically translate3d(), this causes borders to not overlap precisely at different page zoom levels due to aliasing, and also introduce blurring. This doesn't happen with positioning/margin with values set manually in dev tools. Firefox seems to handle this better than Chrome. I like my borders, so instead of attempting hacks to align and overlap borders in a pixel-perfect way -- which is hard to account at different page zoom levels -- we'll simply give extra overlap between tabs so aliasing between tab borders doesn't show. Blurring still happens in Chrome-derivatives, however. Ah, and, even if you don't use page zoom, chances are you may be using display scaling (e.g. 125%) so you could be affected by this 'bug' regardless. */
+body #root-widget .note-tab-wrapper { 
+    /* -6px margin gets rid of gap between tabs, extra -1px for extra overlap. */
+    margin-left: -7px;
+}
+body #root-widget .note-new-tab { 
+    /* -1px to overlap border, extra -1px for reason above. */
+    margin-left: -2px;
+    /* Compensate button icon alignment due to negative margin. */
+    padding-left: 1px; 
+}
+
+/* Tab row appearance. */
+body #root-widget .tab-row-widget {
+    /* Sit below gutter (edge of left pane) */
+    z-index: 0; 
+    /* Hides overflow to left pane caused by page zoom aliasing. */
+    overflow: hidden; 
+    /* As we cannot overflow beyond border (to style active tab, see below) due to hidden overflow, we'll emulate a bottom border inside div using inset box shadow. */
+    box-shadow: inset 0 -1px 0 0 var(--more-accented-background-color); 
+    background: var(--inactive-tab-background-color);
+}
+
+/* Tab element appearance */
+body #root-widget .tab-row-widget .note-tab .note-tab-wrapper,
+body #root-widget .tab-row-widget .note-new-tab {
+    height: 39px; /* Allow line below tab row to go through */
+    border-radius: 0; /* Make tab elements boxy */
+    border-right: thin solid var(--more-accented-background-color);
+    border-left: thin solid var(--more-accented-background-color);
+    background: var(--inactive-tab-background-color);
+}
+
+/* Disable tab tinting using background-color and instead use box-shadow. */
+body #root-widget .tab-row-widget .note-tab:not([active]):hover .note-tab-wrapper,
+body #root-widget .tab-row-widget .note-new-tab:hover {
+    background: var(--inactive-tab-background-color);
+    box-shadow: var(--hover-item-box-shadow);
+}
+
+/* Active tab appearance. */
+body #root-widget .note-tab[active] .note-tab-wrapper {
+    height: 40px; /* Hide border below active tab */
+    padding-bottom: 8px; /* +1 px to substitute missing 1px bottom border */
+    background: var(--main-background-color);
+}
+
+/* Tint close tab button on hover. */
+body #root-widget .tab-row-widget .note-tab-close:hover {
+    border-radius: var(--button-border-radius);
+    box-shadow: var(--hover-item-box-shadow);
+}
+
+/* Hide close note button on inactive tabs. */
+body #root-widget .tab-row-widget .note-tab:not([active]) .note-tab-close {
+    display: none;
+}
+
+/* Desktop app: Colour window buttons (close, minimize, maximize, pin) same as tab row. */
+body .title-bar-buttons {
+    display: flex; /* Gets rid of whitespace gap between buttons caused by html newlines. */
+    font-size: 0.8em; /* Make window icons smaller and not as thick please. */
+    background: var(--inactive-tab-background-color);
+    border-bottom: thin solid var(--more-accented-background-color);
+}
+
+/* Desktop app: Use box shadows instead of background-color to show active. */
+body .title-bar-buttons .top-btn.active {
+    background-color: unset;
+    box-shadow: var(--hover-item-box-shadow);
+    border-bottom: 1px solid transparent !important; /* Prevent box shadow from shading border. */
+}
+
+/* Desktop app: Rotate pin button 90 degrees when window is pinned. */
+body .title-bar-buttons .top-btn.active button::before {
+    transform: rotate(90deg);
+}
+
+/* Desktop app: Don't include tinting bottom border for box shadow. */
+body .title-bar-buttons div:hover button {
+    background-color: unset !important;
+    border-bottom: 1px solid transparent !important; /* Prevent box shadow from shading border. */
+    transition: unset; /* Flashes black bottom border -- remove transition. */
+}
+
+/* || 2.2 - Launcher pane ------ */
+
+
+/* Launcher pane: Make Trilium main button proportional to other buttons */
+body #root-widget .global-menu-button {
+    background-position: 50% 50%;
+    background-size: 75%;
+    border: 0; /* Logo moves when hovered -- apparently there is border */
+    padding: 0;
+}
+
+/* *-- Launcher pane calendar dropdown *-- */
+
+/* Reduce width and space out calendar dropdown menu */
+body #root-widget .dropdown .calendar-dropdown-widget {
+    margin-left: 8px;
+    margin-right: 8px;
+    width: 300px;
+}
+
+/* *-- Launcher pane button shape *-- */
+
+/* Add border separating launcher pane and tree pane */
+body #root-widget #launcher-pane {
+    border-right: thin solid var(--more-accented-background-color);
+}
+
+/* Launcher pane: Create 10px gap between buttons. */
+body #root-widget #launcher-pane,
+body #root-widget #launcher-container,
+body #root-widget #launcher-container > div.component {
+    gap: 10px;
+}
+
+/* Launcher pane: Add inside padding to launcher pane column. */
+body #root-widget #launcher-pane {
+    padding: 5px;
+}
+
+/* Launcher pane: Align buttons and its icons vertically. Also theming. */
+body #root-widget #launcher-pane .global-menu,
+body #root-widget #launcher-pane .launcher-button,
+body #root-widget #launcher-pane .right-dropdown-widget {
+    /* Center icon in button */
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    /* Square buttons */
+    height: unset;
+    width: 100%;
+    aspect-ratio: 1/1;
+    flex-shrink: 0; /* Don't shrink button when space-constrained */
+    
+    /* Rounded border when hovered on. */
+    border-radius: var(--button-border-radius);
+}
+
+/* For some reason sync icons has top position, causing the button to look off-center. */
+body #root-widget #launcher-pane .sync-status .sync-status-icon {
+    top: unset;
+}
+body #root-widget #launcher-pane .sync-status {
+    display: flex; /* To use flexbox centering properties. */
+}
+
+/* Make the update available icon closer to main icon. Default is -30px. */
+body #root-widget #launcher-pane .global-menu .global-menu-button-update-available {
+    right: -25px;
+    bottom: -25px;
+}
+
+/* || 2.3 - Tree pane ---------- */
+
+/* Let gutter sit flush with tab border and sidebar */
+body #root-widget .gutter.gutter-horizontal {
+    width: 1px !important; /* Ensure gutter consume 1px screen space only */
+    background: transparent;
+    border-left: thin solid var(--more-accented-background-color);
+    
+    /* Increase clickable area */
+    position: relative;
+    padding: 0 0.1rem 0 0.1rem;
+    margin: 0 -0.1rem 0 -0.1rem;
+    left: 0.1rem;
+    z-index: 2;
+    
+    /* Fade out and in for color transition */
+    transition: background-color 0.25s linear;
+}
+
+/* Indicate gutter is draggable on hover */
+body #root-widget .gutter.gutter-horizontal:hover {
+    background: var(--more-accented-background-color);
+}
+
+/* Adds padding to left and right of note tree */
+body #root-widget .tree {
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+/* Round borders round borders let's goo. Affects tree elements. */
+body #root-widget .fancytree-node {
+    /*height: max-content;*/
+    border-radius: var(--button-border-radius);
+}
+
+/* Tree item hover appearance */
+body #root-widget .fancytree-node:hover {
+    border: 1px solid transparent;
+    box-shadow: var(--hover-item-box-shadow);
+}
+
+/* Tree item appearance -- truncate note title */
+body #root-widget .fancytree-title {
+    top: 0px;                /* Centers text (perceptually) by removing top offset on tree title */
+    overflow: hidden;        /* Hide overflowing text */
+    text-overflow: ellipsis; /* Truncate overflowed text with ellipsis */
+}
+
+/* Hovering over tree item buttons should tint instead of dotted border */
+body #root-widget .tree-item-button:hover {
+    border: 1px solid transparent;
+    box-shadow: var(--hover-item-box-shadow);
+}
+
+/* *-- Tree font sizing *-- */
+
+/* I made these for mobile first, then thought maybe I should do it on desktop instead. To make it consistent. Now that I think about it, I'm not sure what these changes. Probably behaviour with different tree font sizes... or the use of flexbox align. */
+
+/* Tree title should inherit font size while other elements gets 1.2x the font size. */
+body #root-widget .fancytree-node > *:not(.fancytree-title),
+body #root-widget .fancytree-node .fancytree-expander::before {
+    /* ^ Specificity issue on !important property */
+    font-size: 1.2em !important;
+}
+body #root-widget .fancytree-node > .fancytree-title {
+    font-size: inherit !important;
+    
+    /* Spacing between title and icon */
+    margin-left: 7px !important;
+}
+body #root-widget .fancytree-node .fancytree-expander {
+    /* Spacing between expander and icon */
+    /* margin-right: 2px !important; */
+    padding: .5em; /* Increase clickable area of expander. */
+    margin: -.5em;
+    margin-right: calc(-.5em + 2px);
+    box-sizing: content-box;
+}
+
+/* Remove extraneous top properties and margins from tree items */
+body #root-widget .fancytree-node > *,
+body #root-widget .fancytree-node .fancytree-expander::before {
+    /* ^ Specificity issue on !important property */
+    top: 0;
+    margin: 0;
+}
+
+/* Centers icon within buttons in tree items */
+body #root-widget .fancytree-node > *:not(.tree-item-button, .fancytree-title),
+body #root-widget .fancytree-node:hover > .tree-item-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* *-- Tree floating buttons *-- */
+
+/* Push up floating action buttons up a bit from bottom of viewport */
+body #root-widget .tree-actions {
+    margin-bottom: 5px;
+    right: 10px;
+    border: none;
+    border-radius: var(--button-border-radius);
+    background: transparent;
+}
+
+/* Push up floating button popup menu a bit. */
+body #root-widget .tree-settings-popup {
+    translate: 0 -5px;
+}
+
+/* Style floating buttons */
+body #root-widget button.tree-floating-button {
+    margin: 0;
+    margin-left: 5px;
+    border: 0; /* Eeeh I prefer without border */
+    border-radius: var(--button-border-radius);
+}
+
+/* || 2.4 - Quick search ------- */
+
+/* Center quick search by equal padding */
+body #root-widget .quick-search { 
+    /*
+    --quick-search-padding: 10px;
+    padding: var(--quick-search-padding); 
+    */
+    padding: 10px; 
+    
+    /* Make tree as if scroll under search bar */
+    padding-bottom: 0px;
+    height: 45px; /* Down from 50px. */
+}
+
+/* Colors search button and input box to look lke a singular text box. */
+body #root-widget .quick-search .search-button,
+body #root-widget .quick-search input {
+    background: var(--main-background-color) !important;
+    border: 1px solid var(--button-border-color);
+    height: 100%;
+}
+
+/* Adds left border + rounding */
+body #root-widget .quick-search .search-button {
+    border-right: none;
+    border-top-left-radius: var(--button-border-radius);
+    border-bottom-left-radius: var(--button-border-radius);
+    /* Center icon of search button */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Adds right border + rounding */
+body #root-widget .quick-search input {
+    border-left: none;
+    border-top-right-radius: var(--button-border-radius);
+    border-bottom-right-radius: var(--button-border-radius);
+    /* Make placeholder text closer to search button. */
+    padding-left: 0px;
+}
+
+/* Tint search bar on hover of button. */
+body #root-widget .quick-search .input-group-prepend .search-button:hover {
+    box-shadow: unset;
+}
+body #root-widget .quick-search .input-group-prepend:hover:not(:has(.dropdown-menu:hover)) .search-button,
+body #root-widget .quick-search .input-group-prepend:hover:not(:has(.dropdown-menu:hover)) + input {
+    /* Apparently focus effect below has higher specificity. So !important. */
+    box-shadow: var(--hover-item-box-shadow) !important;
+}
+
+/* Disable focus effect on quick search. */
+body #root-widget .quick-search .input-group-prepend > .search-button:focus,
+body #root-widget .quick-search > input:focus {
+    box-shadow: unset;
+}
+
+/* Align dropdown search result to search bar */
+body #root-widget .quick-search .dropdown-menu {
+    margin-left: 10px;
+    margin-top: 5px;
+    transform: none !important;
+    top: 100% !important;
+}
+
+/* Truncate overflowing text in search result with ellipsis */
+body #root-widget .quick-search .dropdown-menu .dropdown-item {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* || 2.5 - Note --------------- */
+
+/* *-- Note title *-- */
+
+/* Adds padding above note title */
+body #root-widget .split-note-container-widget {
+    padding-top: 8px;
+}
+
+/* Truncate note title on overflow */
+body #root-widget .note-title {
+    overflow: hidden;        /* Hide overflowing text */
+    text-overflow: ellipsis; /* Truncate overflowed text with ellipsis */
+}
+
+/* *-- Table of content *-- */
+
+/* Pads table of contents header the same as with its content */
+body #root-widget .card-header {
+    border-radius: 0 !important; /* Border is rounded by default? */
+}
+
+/* Sit the TOC title text a bit further from edge */
+body #root-widget .card-header-title {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+}
+
+/* More area for text space! */
+body #root-widget #right-pane .card-body {
+    padding: 0;
+}
+
+/* Why even justify? */
+body #root-widget #right-pane li {
+    text-align: unset;
+    text-justify: unset;
+}
+
+/* *-- Note content *-- */
+
+/* Makes note in readonly and editable mode horizontal padding similar */
+body #root-widget .note-detail-readonly-text,
+body #root-widget .note-detail-editable-text {
+    padding-left: 14.4px;
+    padding-right: calc(14.4px - var(--scrollbar-width));
+}
+
+/* For some reason, .note-detail-editable-text-editor has 9.6px padding on either side. Let's make it consistent for readonly text. */
+body #root-widget .note-detail-readonly-text-content {
+    padding-left: 9.6px;
+    padding-right: 9.6px;
+}
+
+/* Get rid of double scrollbar for mermaid diagram notes */
+/* Still buggy though (panning during zoom, window resize) */
+body #root-widget .mermaid-render > svg {
+    height: 100%;
+    width: 100%;
+}
+
+/* *-- Floating buttons *-- */
+
+/* Prevent the edit button 'ta-dah!' effect */
+body #root-widget .bx-tada.bx-lg {
+    font-size: 150% !important;
+    animation: inherit !important;
+}
+
+/* Tint backlinks button -- which for some reason isn't a button -- when hovered on. */
+body #root-widget .backlinks-ticker:hover {
+    box-shadow: var(--hover-item-box-shadow);
+}
+
+/* Disable border effect on hover of close floating button button. */
+body #root-widget .close-floating-buttons-button:hover {
+    border-color: transparent;
+}
+
+/* Make floating buttons transluscent when not in focus */
+@keyframes transluce {
+    to {
+        opacity: 40%;
+    }
+}
+body #root-widget .floating-buttons-children {
+    /* Center floating buttons row */
+    align-items: center;
+    
+    /* Adds gap of 5px between buttons */
+    gap: 5px;
+}
+/* Don't transluce when backlink items are shown -- :has selector is only supported by Firefox 121 (Dec 2023) but whatever. */
+body #root-widget .floating-buttons-children:has(.backlinks-items[style*="display: none;"]){
+    animation: transluce 0.5s forwards 3s;
+}
+body #root-widget .floating-buttons-children:has(.backlinks-items[style*="display: none;"]):hover {
+    animation: unset;
+}
+
+/* We'll use the gap property to add, wait for it, gap between buttons. So let's remove all margins. */
+body #root-widget .floating-buttons-children button,
+body #root-widget .floating-buttons-children div {
+    margin: 0 !important;
+}
+
+/* Theme the buttons consistently, except the close button. */
+body #root-widget .floating-buttons-children button:not(.close-floating-buttons-button),
+body #root-widget .floating-buttons-children .backlinks-ticker {
+    padding: 4px 10px 4px 10px;
+    border: 1px solid transparent;
+    border-radius: var(--button-border-radius);
+    background: var(--accented-background-color);
+    opacity: 100%;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Backlink button theming */
+body #root-widget .floating-buttons-children .backlinks-items {
+    /* Align backlink dropdown to backlink button. */
+    right: 0px;
+    
+    /* Make it closer to the button but same distance as gap between floating items buttons. */
+    top: calc(100% + 5px);
+}
+
+/* For relation map tho will be deprecated. Fuse zoom in and out buttons. */
+body #root-widget .floating-buttons-children .btn-group .relation-map-zoom-in {
+    border-radius: 10px 0 0 10px;
+}
+body #root-widget .floating-buttons-children .btn-group .relation-map-zoom-out {
+    border-radius: 0 10px 10px 0;
+}
+
+/* Fixes a looot of my problems. The .component class has contain set to size. I don't want that. Ideally elements should be constrained to explicitly set dimensions, but whatever. */
+body #root-widget .component.button-widget {
+    contain: unset;
+}
+
+/* *-- Ribbon *-- */
+
+/* Remove 5px bottom margin of ribbon container. */
+body #root-widget .ribbon-container {
+    margin-bottom: 0;
+    
+    /* Pad edge of parent to ribbon. */
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+/* Remove any margin within their child as we have set padding on their parent. */
+body #root-widget .ribbon-container > .ribbon-top-row > div,
+body #root-widget .ribbon-container > .ribbon-body-container > div {
+    margin: 0;
+}
+
+/* For some reason top property of 3px are set on ribbon item's icon. */
+body #root-widget .ribbon-tab-container .bx,
+body #root-widget .ribbon-button-container > * {
+    top: 0;
+}
+
+/* Gap tabs and buttons of top row using flex instead of .spacer class. */
+body #root-widget .ribbon-top-row,
+body #root-widget .ribbon-top-row > * {
+    column-gap: 10px;
+}
+body #root-widget .ribbon-top-row .ribbon-tab-spacer {
+    display: none;
+}
+
+/* Simulate bottom border on top row, on the inside. */
+body #root-widget .ribbon-top-row {
+    box-shadow: inset 0 -1px 0 0 var(--main-border-color);
+}
+
+/* Allow overflow wrappping of tab container and button group. */
+body #root-widget .ribbon-top-row > * {
+    flex-flow: row wrap;
+    /* Align bottom so border overlaps. */
+    align-items: end;
+}
+
+/* Justify top row groups to left and right edge of ribbon. */
+body #root-widget .ribbon-top-row > *:first-child {
+    justify-content: start;
+}
+body #root-widget .ribbon-top-row > *:last-child {
+    justify-content: end;
+}
+
+/* Padding, alignment, and gap changes for individual ribbon tabs. */
+body #root-widget .ribbon-top-row .ribbon-tab-title {
+    /* Add padding to ribbon items so tinting looks nice. */
+    --ribbon-tab-title-base-padding: 5px;
+    padding: var(--ribbon-tab-title-base-padding);
+    
+    /* Center ribbon items' elements. */
+    display: flex;
+    align-items: center;
+    
+    /* Space out icon and item title. */
+    gap: 5px;
+    
+    /* Don't fill remaining height, such as when top row is overflowing, so tint when hovering doesn't look tall. */
+    height: fit-content;
+    
+    /* Min width was set to 24px. Unset it so as to force overflow/wrap instead of shrinking tab row. */
+    min-width: unset;
+}
+
+/* Tint ribbon buttons on hover */
+body #root-widget .ribbon-top-row .ribbon-tab-title:hover { 
+    box-shadow: var(--hover-item-box-shadow);
+}
+
+/* Styling active ribbon tab. */
+body #root-widget .ribbon-top-row .ribbon-tab-title.active {
+    /* Re-set bottom 3px border on hover. */
+    border-bottom: 3px solid var(--main-text-color);
+    /* Compensate for 3px bottom border so as to not shift text and icon. */
+    /* Actually -2px not sure why. */
+    padding-bottom: calc(var(--ribbon-tab-title-base-padding) - 3px);
+    /* Don't shrink active tab when space-constrained. */
+    flex-basis: fit-content;
+}
+
+/* Remove per element bottom border as we have simulated bottom border on their common parent. */
+body #root-widget .ribbon-top-row .ribbon-tab-title,
+body #root-widget .ribbon-top-row .ribbon-button-container {
+    border-bottom: none;
+}
+
+/* Making the buttons proper. Make it fit with other ribbon elements. */
+body #root-widget .ribbon-button-container > *,
+body #root-widget .ribbon-button-container button {
+    /* The dropdown button overflows a bit off the container. This somehow makes it proper. */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    /* As we have used gap before to add space betwen buttons, remove margin. */
+    margin: 0;
+}
+
+/* Removes border and its radius on buttons here to fit the rest of ribbon. */
+body #root-widget .ribbon-button-container button {
+    border: unset;
+    border-radius: unset;
+    /*color: var(--muted-text-color);*/
+}
+
+/* Specifically style attribute list buttons, in the 'Owned attributes' tab. */
+body #root-widget .ribbon-body-container .attribute-list .bx {
+    bottom: 9px; /* Welp, this looks centered to text. */
+    padding: 2px; /* Add padding so hover tint has some pad. */
+    
+    /* As this style affects the close button in the dialogue box... */
+    border-radius: var(--button-border-radius);
+    height: fit-content;
+    width: fit-content;
+}
+body #root-widget .ribbon-body-container .attribute-list .bx:hover {
+    border-color: transparent;
+    box-shadow: var(--hover-item-box-shadow);
+}
+
+/* Add attribute button creates a dialogue box. Let's tone down the shadow on the box. */
+body #root-widget .ribbon-body-container .attribute-list .attr-detail {
+    border-radius: var(--button-border-radius);
+    /*box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.25);*/
+    box-shadow: none;
+}
+
+/* Hide shared note info widget after page load so it doesn't take vertical space */
+@keyframes retract {
+    to {
+        opacity: 0; max-height: 0; border: none;
+        margin-top: 0; margin-bottom: 0; 
+        padding-top: 0; padding-bottom: 0;
+    }
+}
+body #root-widget .shared-info-widget {
+    max-height: 100%;
+    animation: retract 0.5s forwards 3s;
+}
+body #root-widget .shared-info-widget:hover {
+    animation: unset;
+}
+
+/* || 2.6 - Dropdown Menu -------------- */
+
+/* Dropdown menu has background-color property set, not background, which causes scrollbar gutter to be transparent through div. Set color using background property instead. Targetting all dropdown menu including outside #root-widget. */
+body .dropdown-menu {
+    background: var(--main-background-color);
+    border-radius: var(--button-border-radius); /* Uniform border radius */
+    
+    box-shadow: unset !important; /* Disable all box shadows for now */
+    /*box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.25) !important;*/
+    border-width: 1px;
+    
+    font-size: inherit;
+}
+
+/* Dropdown menu: Apply box shadow effect on hover of dropdown items. */
+body .dropdown-menu a:hover:not([disabled]),
+body .dropdown-item:hover:not([disabled]) {
+    box-shadow: var(--hover-item-box-shadow);
+}
+
+/* Dropdown menu: Remove default border effect on hover. */
+body .dropdown-menu a:hover:not([disabled], .bx),
+body .dropdown-item:hover:not([disabled]) {
+    border-color: transparent !important;
+}
+  
+/* <> 3. = Mobile layout ======================================= */
+
+/* || 3.1 - Fixes -------------- */
+
+/* Disable tooltips -- they show during hover, which doesn't work well with touchscreens */
+/* Fixes tooltip blocking clicks to exit protected mode button */
+body.mobile .tooltip {
+    display: none;
+}
+
+/* || 3.2 - Scrollbar ---------- */
+
+@supports selector(::-webkit-scrollbar) {
+    /* Set scrollbar width */
+    body.mobile ::-webkit-scrollbar {
+        width: var(--scrollbar-width-mobile);
+        height: var(--scrollbar-width-mobile);
+    }
+}
+
+/* Make scrollbar visible permanently */
+/*
+body.mobile ::-webkit-scrollbar-thumb {
+    background-color: rgba(96, 96, 96, 0.1) !important;
+}*/
+
+/* || 3.3 - Launcher pane ------ */
+
+/* *-- Move launcher pane to the top in portrait orientation *-- */
+
+/* Allow padding changes to alter div size (for safe-area insets) */
+body.mobile #root-widget #launcher-pane {
+    box-sizing: content-box;
+}
+
+@media (orientation:landscape) {
+    
+    /* Launcher pane: Make Trilium main button proportional to other buttons */
+    body.mobile #root-widget .global-menu-button {
+        background-position: 50% 50%;
+        background-size: 75%;
+        border: 0; /* Logo moves when hovered -- apparently there is border */
+        padding: 0;
+        width: inherit;
+        aspect-ratio: 1/1;
+    }
+
+    body.mobile #root-widget #launcher-pane {
+        --launcher-pane-pre-inset-padding: 5px;
+        padding: var(--launcher-pane-pre-inset-padding);
+        /*box-sizing: border-box;*/
+        width: 40px !important;
+        min-width: 40px !important;
+        height: unset !important;
+        min-height: unset !important;
+    }
+    
+    body.mobile #root-widget #launcher-container,
+    body.mobile #root-widget #launcher-container > div {
+        width: inherit;
+    }
+
+    body.mobile #root-widget #launcher-pane,
+    body.mobile #root-widget #launcher-container,
+    body.mobile #root-widget #launcher-container > div {
+        gap: 10px;
+    }
+    
+    /* Launcher pane: Align buttons and its icons vertically. Also theming. */
+    body.mobile #root-widget #launcher-pane .global-menu,
+    body.mobile #root-widget #launcher-pane .launcher-button,
+    body.mobile #root-widget #launcher-pane .right-dropdown-widget {
+        /* Center icon in button */
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        /* Square buttons */
+        height: unset;
+        width: inherit; /* As 100% does not work properly with Safari */
+        aspect-ratio: 1/1;
+        flex-shrink: 0; /* Don't shrink button when space-constrained */
+
+        /* Rounded border when hovered on. */
+        border-radius: var(--button-border-radius);
+        
+        flex-direction: column;
+    }
+    
+    /* Launcher pane: Make launcher pane column scrollable. */
+    body.mobile #root-widget #launcher-container {
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+        scrollbar-width: none;
+    }
+    
+}
+
+@media (orientation:portrait) {
+    
+    /* Launcher pane: Make Trilium main button proportional to other buttons */
+    body.mobile #root-widget .global-menu-button {
+        background-position: 50% 50%;
+        background-size: 75%;
+        border: 0; /* Logo moves when hovered -- apparently there is border */
+        padding: 0;
+    }
+    
+    body.mobile #root-widget {
+        flex-direction: column !important;
+    }
+    
+    body.mobile #root-widget #launcher-pane,
+    body.mobile #root-widget #launcher-container,
+    body.mobile #root-widget #launcher-container > div {
+        flex-direction: row !important;
+        gap: 10px;
+    }
+
+    body.mobile #root-widget #launcher-pane {
+        height: 40px; /* Need to be set from parent and inherit until child for 'aspect-ratio' to work. */
+        min-height: 40px;
+        width: unset !important;
+        min-width: unset !important;
+
+        padding: 5px;
+        border-right: none;
+        border-bottom: thin solid var(--more-accented-background-color);
+    }
+    
+    body.mobile #root-widget #launcher-container,
+    body.mobile #root-widget #launcher-container > div {
+        height: inherit;
+    }
+
+    /* Launcher pane: Align buttons and its icons vertically. Also theming. */
+    body.mobile #root-widget #launcher-pane .global-menu,
+    body.mobile #root-widget #launcher-pane .launcher-button,
+    body.mobile #root-widget #launcher-pane .right-dropdown-widget {
+        /* Center icon in button */
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        /* Square buttons */
+        height: inherit;
+        width: unset;
+        aspect-ratio: 1/1;
+        flex-shrink: 0; /* Don't shrink button when space-constrained */
+
+        /* Rounded border when hovered on. */
+        border-radius: var(--button-border-radius);
+    }
+
+    /* Launcher pane: Make launcher pane column scrollable. */
+    body.mobile #root-widget #launcher-container {
+        overflow-y: hidden !important;
+        overflow-x: auto !important;
+        scrollbar-width: none;
+    }
+}
+
+/* || 3.4 - Tree pane ---------- */
+
+/* *-- Tree font sizing *-- */
+
+/* Separate tree font size for mobile layout. */
+body.mobile #root-widget .tree-wrapper {
+    font-size: var(--mobile-tree-font-size);
+}
+
+/* Change tree pane colour back to how it is like in desktop + border appropriately. */
+body.mobile #root-widget .quick-search,
+body.mobile #root-widget .tree-wrapper {
+    background: var(--left-pane-background-color);
+}
+/* @media (orientation:landscape) */
+/* Note area appears at 576px (Bootstrap's .d-sm-* breakpoint). */
+@media (min-width: 576px) {
+    body.mobile #root-widget .quick-search,
+    body.mobile #root-widget .tree-wrapper {
+        border-right: 1px solid var(--more-accented-background-color);
+    }
+}
+
+/* Align tree to quick search bar by removing tree wrapper padding */
+body.mobile #root-widget .tree-wrapper {
+    padding: 0;
+}
+
+/* The enable floating tree buttons on mobile. */
+body.mobile #root-widget .tree-wrapper .tree-actions > button {
+    position: static;
+    display: block;
+}
+
+/* || 3.5 - Note --------------- */
+
+/* *-- Note title bar *-- */
+
+/* Not sure why iOS' Safari applies padding to the title input div. Removes padding here. */
+body.mobile #root-widget input.note-title {
+    padding: 0;
+}
+
+/* Selects the title row parent div. */
+/* body.mobile #root-widget > #launcher-pane + .component > .component + .component > .component:first-child {*/
+body.mobile #root-widget .component:has(> .note-title-widget) {    
+    display: flex;
+    flex-direction: row;
+    
+    gap: 5px;
+    
+    /*padding-left: 5px;*/
+    /*padding-right: 5px;*/
+    /*padding-top: 5px;*/
+    padding: 5px;
+    
+    /* Give more vertical space to note area. */
+    margin-bottom: -5px;
+    
+    /* Default is 'larger' which is definitely big as title input sets 180%. */
+    font-size: inherit !important;
+    
+    /* Ah if note is not opened, it will shrink. Need to set min-height. Value after testing. */
+    min-height: 53.2px;
+    
+    /*
+    margin-left: 10px;
+    margin-right: 10px;
+    padding-left: 0;
+    padding-right: 0;
+    padding-bottom: 2px;
+    border-bottom: 1px solid var(--main-border-color);
+    min-height: 50.2px;
+    */
+}
+/* Selects descendants of title row parent div. Reset padding, margin, and positioning. */
+body.mobile #root-widget .action-button.bx-menu,
+body.mobile #root-widget .action-button.bx-menu ~ * {
+    padding: 0 !important;
+    margin: 0;
+    top: 0 !important;
+}
+/* Style buttons on left and right of title input. */
+body.mobile #root-widget .action-button.bx-menu,
+body.mobile #root-widget .action-button.bx-menu ~ *:not(.note-title-widget) {
+    aspect-ratio: 1/1;
+    height: 75%;
+    justify-content: center;
+    border-radius: var(--button-border-radius);
+}
+
+/* *-- Note content *-- */
+
+/* Remove extra padding on the right and bottom of note */
+body.mobile #root-widget .note-detail {
+    padding-right: 0px !important;
+    padding-bottom: 0px !important;
+}
+
+/* Makes note in readonly and editable mode horizontal padding similar */
+body.mobile #root-widget .note-detail-readonly-text,
+body.mobile #root-widget .note-detail-editable-text {
+    padding-left: 2.4px;
+    /*padding-right: calc(2.4px - var(--scrollbar-width-mobile));*/
+    padding-right: 2.4px;
+}
+
+/* Tune text editor toolbar panel visibility */
+body.mobile .ck-toolbar-container {
+    margin-left: 15px;
+}
+
+/* Tune text editor toolbar panel button visibility */
+body.mobile .ck.ck-block-toolbar-button {
+    margin-left: 3px;
+}
+
+/* Remove the arrow pointing to toolbar panel button */
+body.mobile .ck-toolbar-container::before,
+body.mobile .ck-toolbar-container::after {
+    display: none;
+}
+
+/* Mitigate backlink overflow on mobile view */
+body.mobile #root-widget .backlinks-items {
+    right: 0px;
+    width: 80vw;
+    max-width: 360px;
+    /*box-shadow: rgba(0, 0, 0, 0.2) 0px 0px 12px;*/
+}
+
+/* Limit backlink excerpt length */
+/*
+#root-widget .backlink-excerpt {
+    max-height: 240px;
+    overflow-y: hidden;
+    text-overflow: ellipsis;
+}
+*/
+
+/* Code linting doesn't seem to work on mobile anyway, or at least I couldn't get it to work on a js file. Let's remove the gutter to increase screen estate. */
+body.mobile #root-widget .CodeMirror-gutter.CodeMirror-lint-markers {
+    display: none;
+}
+
+/* || 3.6 - Dropdown menu ------ */
+
+/* *-- Generic dropdown menu settings *-- */
+
+/* Dropdown menu: Make dropdown menu fullscreen */
+body.mobile #root-widget .global-menu > .dropdown-menu,
+body.mobile #root-widget .bx-calendar + .dropdown-menu,
+body.mobile #context-menu-container {
+    /* Positioning and fullscreen-ing */ 
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    transform: none !important;
+    margin: 0;
+    height: 100vh;
+    width: 100vw;
+    border: none;
+    
+    /* Tap space to close menu */
+    padding-top: 8vh;
+    padding-bottom: 8vh;
+    
+    /* Make dropdown menu scrollable */
+    overflow-y: scroll;
+}
+
+/* Dropdown menu: Contain submenu items within their parent */
+body.mobile .dropdown-submenu {
+    contain: content;
+}
+
+/* Dropdown menu: Prevent submenu toggle reflow when viewport is wide */
+body.mobile .dropdown-submenu > .dropdown-toggle {
+    display: block;
+}
+
+/* Dropdown menu: Make submenu flush with parent menu */
+body.mobile .dropdown-submenu > .dropdown-menu {
+    /* Correctly position submenu items below dropdown toggle */
+    position: relative;
+    top: 0px !important;
+    left: 0px;
+    margin: 0px;
+    padding-top: 3px;
+    padding-bottom: 0px;
+    min-width: 0;
+    width: 100%;
+    background: transparent !important;
+    border: none;
+    border-radius: 0;
+    
+    /* Make font size of submenu same as parent menu */
+    font-size: inherit !important; 
+    
+    /* Expand submenu as toggling dropdowns within menu using touch doesn't work right now */
+    display: block;
+    
+    /* Indent dropdown submenu to align icons with parent text above it */
+    padding-left: 6px !important;
+}
+
+/* Dropdown menu: Padding consistency of dropdown items for all dropdown menus */
+body.mobile .dropdown-item {
+    padding: .25rem 1.5rem .25rem 1.5rem !important;
+}
+
+/* Dropdown menu: Make appearance of icons consistent for all dropdown menus */
+body.mobile .dropdown-item .bx {
+    /* Vertically centering icon with title text. */
+    position: relative;
+    top: 3px;
+    
+    /* Affects icon size. */
+    font-size: 120%;
+    
+    /* Reduce excessive whitespace between icons and their accompanying title text */
+    /* Let me reword that: move item's title text closer to icon */
+    margin-right: -5px !important;
+}
+
+/* Dropdown menu: Apply box shadow effect on dropdown items (except to dropdown submenu). */
+body.mobile .dropdown-menu a:hover:not(.disabled .dropdown-submenu), 
+body.mobile .dropdown-item:hover:not(.disabled, .dropdown-submenu) {
+    box-shadow: var(--hover-item-box-shadow);
+}
+
+/* Dropdown menu: As submenu is contained within dropdown item, disable the set box shadow effect here. */
+body.mobile .dropdown-item.dropdown-submenu:hover:not(.disabled) {
+    box-shadow: none;
+}
+
+/* Dropdown menu: Center calendar widget */
+body.mobile #root-widget .dropdown .calendar-dropdown-widget {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* *-- Global dropdown menu *-- */
+
+/* Hack to make gap between icon and title of global menu dropdown same with context menu dropdowns.
+1. As empty icon class '.bx-empty' has fixed width of 1 em, we need to unset it to allow the span containing empty icon to expand beyond that width.
+2. We do need to replace the width of 1 em that was lost in the previous step, so, coincidentally, that's the width two &nbsp.
+3. The whitespace difference between dropdown menus of global menu and others is one &nbsp. */
+body.mobile #root-widget .global-menu .bx-empty { 
+    width: unset;      /* 1 */   
+} 
+body.mobile #root-widget .global-menu .bx-empty::before { 
+    content: "\a0\a0"; /* 2 */
+} 
+body.mobile #root-widget .global-menu .bx::after { 
+    content: "\a0";    /* 3 */
+} 
+
+/* *-- Search dropdown menu *-- */
+
+/* Fixed values for theming of the search dropdown menu. Not proud of this, but here it is for now. */
+
+/* Don't contain search bar to tree pane. */
+body.mobile #root-widget #launcher-pane + div > :first-child {
+    contain: none !important;
+}
+
+@media (orientation:portrait) {
+    body.mobile #root-widget .quick-search .dropdown-menu {
+        position: absolute;
+        max-width: unset;
+        margin-left: 10px !important;
+        margin-right: 10px !important;
+        transform: none !important;
+        
+        /* Important when clicking on search button instead of enter */
+        top: 100% !important; 
+        
+        height: fit-content;
+        max-height: calc(100vh - 120px);
+
+        width: calc((100vw - 10px) - 10px);
+    }
+}
+
+@media (orientation:landscape) {
+    
+    body.mobile #root-widget .quick-search .dropdown-menu {
+        position: absolute;
+        max-width: unset;
+        margin-left: 10px !important;
+        margin-right: 10px !important;
+        transform: none !important;
+        
+        /* Important when clicking on search button instead of enter */
+        top: 100% !important;
+        
+        height: fit-content;
+        max-height: calc(100vh - 60px);
+        
+        min-width: calc(100% - 20px);
+        width: 75vw;
+        max-width: fit-content;      
+    }
+}
+
+/* Full search feature probably isn't implemented in mobile frontend. Hides the 'Show in full search' button. */
+body.mobile #root-widget .quick-search .dropdown-menu > a.dropdown-item {
+    display: none;
+}
+
+/* Hides arrow on tooltips
+.tooltip > .arrow {
+    display: none;
+}
+*/
